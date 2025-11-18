@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Apartment to Excel",
+  "version": "0.0.1",
+  "description": "Experiment: popup and content script in TypeScript (later).",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Apartment to Excel"
+  }
+}
