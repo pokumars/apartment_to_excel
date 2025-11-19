@@ -1,10 +1,24 @@
 {
   "manifest_version": 3,
-  "name": "Apartment to Excel",
-  "version": "0.0.1",
-  "description": "Experiment: popup and content script in TypeScript (later).",
+  "name": "Apartment → Excel (TS)",
+  "version": "0.0.2",
+  "description": "Experiment: popup and content script in TypeScript.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": [
+    "https://asunnot.oikotie.fi/*",
+    "https://www.vuokraovi.com/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Apartment to Excel"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://asunnot.oikotie.fi/*",
+        "https://www.vuokraovi.com/*"
+      ],
+      "js": ["dist/content.js"]
+    }
+  ]
 }
