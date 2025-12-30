@@ -3,10 +3,11 @@
   "name": "Apartment → Excel (TS)",
   "version": "0.0.2",
   "description": "Experiment: popup and content script in TypeScript.",
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "clipboardWrite"],
   "host_permissions": [
     "https://asunnot.oikotie.fi/*",
-    "https://www.vuokraovi.com/*"
+    "https://www.vuokraovi.com/*",
+    "http://localhost:8787/*"
   ],
   "action": {
     "default_popup": "popup.html",
