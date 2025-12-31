@@ -1,3 +1,6 @@
+import { fromHaeReittiButton } from "./sites/vuokraovi/coordinates";
+import { Coordinates } from "./types";
+
 function getText(selectors: string[]): string {
   for (const sel of selectors) {
     const el = document.querySelector<HTMLElement>(sel);
@@ -14,6 +17,20 @@ function detectSite(): "vuokraovi" | "oikotie" | "unknown" {
   if (host.includes("vuokraovi.com")) return "vuokraovi";
   if (host.includes("oikotie.fi")) return "oikotie";
   return "unknown";
+}
+
+/**
+ * Attempts to extract coordinates from the page.
+ * Returns null if not found (will need geocoding).
+ */
+function extractCoordinates(): Coordinates | null {
+  const site = detectSite();
+
+  // Vuokraovi-specific: Extract from "Hae reitti" button href
+  if (site === "vuokraovi") {
+    return fromHaeReittiButton();
+  }
+  return null;
 }
 
 function extractListingData() {
@@ -58,6 +75,8 @@ function extractListingData() {
     address = getText(["[itemprop='streetAddress']", ".address"]);
   }
 
+  const coordinates = extractCoordinates();
+
   return {
     site,
     url: window.location.href,
@@ -65,6 +84,7 @@ function extractListingData() {
     address,
     rentText,
     sizeText,
+    coordinates,
   };
 }
 
