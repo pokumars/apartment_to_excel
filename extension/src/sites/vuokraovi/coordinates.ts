@@ -1,6 +1,90 @@
 import { Coordinates } from "../../types";
 
 /**
+ * Extracts coordinates from window.digitalData in the page header.
+ * Returns null if not found.
+ * This is the most reliable method as it's in a script tag in the header and loads early.
+ * Path: window.digitalData.product[0].productInfo.location.geoCoordinates
+ */
+export const fromDigitalData = (): Coordinates | null => {
+  // First, try to extract directly from the script tag (most reliable)
+  const scriptTags = document.querySelectorAll("script");
+  for (const script of Array.from(scriptTags)) {
+    const text = script.textContent || script.innerHTML;
+    if (
+      text &&
+      text.includes("window.digitalData") &&
+      text.includes("geoCoordinates")
+    ) {
+      try {
+        // Try to extract the JSON from the script tag
+        // Look for the pattern: window.digitalData = {...};
+        const match = text.match(/window\.digitalData\s*=\s*({[\s\S]*?});/);
+        if (match) {
+          const digitalDataStr = match[1];
+          const digitalData = JSON.parse(digitalDataStr);
+
+          const product = digitalData?.product;
+          if (product && Array.isArray(product) && product.length > 0) {
+            const geoCoordinates =
+              product[0]?.productInfo?.location?.geoCoordinates;
+            if (geoCoordinates) {
+              const lat = geoCoordinates.latitude;
+              const lon = geoCoordinates.longitude;
+              if (
+                typeof lat === "number" &&
+                typeof lon === "number" &&
+                !isNaN(lat) &&
+                !isNaN(lon)
+              ) {
+                return { lat, lon };
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // If parsing fails, continue to next script tag
+        continue;
+      }
+    }
+  }
+
+  /*  // Fallback: Try to access window.digitalData (might not be available yet)
+  const digitalData = (window as any).digitalData;
+  if (!digitalData) {
+    return null;
+  }
+
+  try {
+    const product = digitalData.product;
+    if (!product || !Array.isArray(product) || product.length === 0) {
+      return null;
+    }
+
+    const firstProduct = product[0];
+    if (!firstProduct?.productInfo?.location?.geoCoordinates) {
+      return null;
+    }
+
+    const geoCoordinates = firstProduct.productInfo.location.geoCoordinates;
+    const lat = geoCoordinates.latitude;
+    const lon = geoCoordinates.longitude;
+
+    if (
+      typeof lat === "number" &&
+      typeof lon === "number" &&
+      !isNaN(lat) &&
+      !isNaN(lon)
+    ) {
+      return { lat, lon };
+    }
+  } catch (e) {
+    return null;
+  }
+ */
+  return null;
+};
+/**
  * Extracts coordinates from the "Hae reitti" button href.
  * Returns null if not found.
  * This hae reitti button is only available on owhen a user scrolls down on the page far enough for the map to load.

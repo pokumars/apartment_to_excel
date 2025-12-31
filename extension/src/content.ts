@@ -1,4 +1,8 @@
-import { fromHaeReittiButton } from "./sites/vuokraovi/coordinates";
+import {
+  fromDigitalData,
+  fromHaeReittiButton,
+  fromStreetViewButton,
+} from "./sites/vuokraovi/coordinates";
 import { Coordinates } from "./types";
 
 function getText(selectors: string[]): string {
@@ -21,13 +25,22 @@ function detectSite(): "vuokraovi" | "oikotie" | "unknown" {
 
 /**
  * Attempts to extract coordinates from the page.
- * Returns null if not found (will need geocoding).
+ * Returns null if not found TODO:(will need geocoding).
  */
 function extractCoordinates(): Coordinates | null {
   const site = detectSite();
 
-  // Vuokraovi-specific: Extract from "Hae reitti" button href
+  // Vuokraovi-specific: Try multiple methods in order of reliability
   if (site === "vuokraovi") {
+    // 1. Try digitalData first (most reliable - in header, loads early)
+    const coords = fromDigitalData();
+    if (coords) return coords;
+
+    // 2. Try Street View button (available when map loads)
+    const streetViewCoords = fromStreetViewButton();
+    if (streetViewCoords) return streetViewCoords;
+
+    // 3. Try "Hae reitti" button (requires scrolling to map)
     return fromHaeReittiButton();
   }
   return null;
