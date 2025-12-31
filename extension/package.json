@@ -5,13 +5,18 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "npm run build:content && npm run build:popup",
+    "build:content": "esbuild src/content.ts --bundle --outfile=dist/content.js --format=iife --platform=browser --target=es2020",
+    "build:popup": "esbuild src/popup.ts --bundle --outfile=dist/popup.js --format=iife --platform=browser --target=es2020",
+    "type-check": "tsc --noEmit",
+    "watch": "npm run build:content -- --watch & npm run build:popup -- --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/chrome": "^0.1.30",
+    "esbuild": "^0.27.2",
     "typescript": "^5.9.3"
   }
 }
