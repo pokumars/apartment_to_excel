@@ -29,3 +29,36 @@ export const fromHaeReittiButton = (): Coordinates | null => {
   }
   return null;
 };
+
+/**
+ * Extracts coordinates from the Street View button href.
+ * Returns null if not found.
+ * The Street View button contains coordinates in the viewpoint parameter:
+ * https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=60.1888,24.97491
+ * This button is available on the page when the user scrolls down far enough for the map to load.
+ * So it should not be the first thing we look for.
+ */
+export const fromStreetViewButton = (): Coordinates | null => {
+  // Try the specific selector provided by the user
+  const streetViewButton = document.querySelector<HTMLAnchorElement>(
+    "#links-item > div > a.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedSecondary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-root.MuiButton-contained.MuiButton-containedSecondary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.eqp02gi0.mui-style-6mhavo"
+  );
+
+  if (streetViewButton && streetViewButton.href) {
+    // Extract coordinates from Google Maps Street View URL: https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=60.1888,24.97491
+    const url = new URL(streetViewButton.href);
+    const viewpoint = url.searchParams.get("viewpoint");
+
+    if (viewpoint) {
+      const [latStr, lonStr] = viewpoint.split(",");
+      const lat = parseFloat(latStr);
+      const lon = parseFloat(lonStr);
+
+      if (!isNaN(lat) && !isNaN(lon)) {
+        return { lat, lon };
+      }
+    }
+  }
+
+  return null;
+};
