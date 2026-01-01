@@ -1,3 +1,4 @@
+import { fromMetaTags } from "./sites/oikotie/coordinates";
 import {
   fromDigitalData,
   fromHaeReittiButton,
@@ -42,6 +43,8 @@ function extractCoordinates(): Coordinates | null {
 
     // 3. Try "Hae reitti" button (requires scrolling to map)
     return fromHaeReittiButton();
+  } else if (site === "oikotie") {
+    return fromMetaTags();
   }
   return null;
 }
